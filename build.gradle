@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.14'
+}
+
+group 'de.wlsc'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.github.javaparser:javaparser-core:3.15.5'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
+    testRuntime "org.junit.vintage:junit-vintage-engine:5.5.2"
+}
+
+test {
+    useJUnitPlatform {
+    }
+}
+
+wrapper {
+    gradleVersion = "6.0.1"
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+patchPluginXml {
+    changeNotes """
+      Initial release
+      """
+}

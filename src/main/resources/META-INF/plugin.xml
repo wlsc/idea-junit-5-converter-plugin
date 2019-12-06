@@ -1,0 +1,13 @@
+<idea-plugin>
+    <id>de.wlsc.junit.converter.plugin</id>
+    <name>JUnit4-to-5-Converter</name>
+    <version>1.0</version>
+    <vendor url="https://wlsc.de">wlsc.de</vendor>
+    <description>JUnit 4 to 5 converter</description>
+    <change-notes/>
+    <actions>
+        <action class="de.wlsc.junit.converter.plugin.ConvertAction" id="ConvertToJUnit5" text="Convert to JUnit 5">
+            <add-to-group group-id="ToolsMenu"/>
+        </action>
+    </actions>
+</idea-plugin>
