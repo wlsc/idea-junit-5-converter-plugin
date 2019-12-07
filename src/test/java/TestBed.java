@@ -19,12 +19,12 @@ public class TestBed {
 
   @Test(timeout = 20L)
   public void name2() {
-
+    name21();
   }
 
   @Test(expected = NullPointerException.class,timeout = 20L)
   public void name21() {
-
+    name2();
   }
 
   @Test
