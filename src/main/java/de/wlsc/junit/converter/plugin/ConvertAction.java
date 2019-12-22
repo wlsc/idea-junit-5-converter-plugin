@@ -82,9 +82,8 @@ public class ConvertAction extends AnAction {
 
   private void convertToJunit5(final Path path) {
 
-    CompilationUnit unit;
     try {
-      unit = StaticJavaParser.parse(path);
+      CompilationUnit unit = StaticJavaParser.parse(path);
 
       replaceImports(unit);
       replaceAnnotations(unit);
