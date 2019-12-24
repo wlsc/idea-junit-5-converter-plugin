@@ -29,6 +29,9 @@ wrapper {
 }
 
 patchPluginXml {
+    pluginDescription """
+        Convert your JUnit 4 tests into JUnit 5 Jupiter with the simple contextual converter
+    """
     changeNotes """
       First version in which a convection between these annotations is possible:
         * @Test with parameters => your code will be wrapped  with analogues functions in JUnit 5

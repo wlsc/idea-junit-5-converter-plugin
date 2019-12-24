@@ -1,13 +1,9 @@
 <idea-plugin>
   <id>de.wlsc.junit.converter.plugin</id>
   <name>JUnit 4 to 5 converter</name>
-  <version>1.0.1</version>
   <vendor url="https://github.com/wlsc/idea-junit-5-converter-plugin">
     idea-junit-5-converter-plugin
   </vendor>
-  <description>Convert your JUnit 4 tests into JUnit 5 Jupiter with the simple contextual
-    converter
-  </description>
   <actions>
     <action class="de.wlsc.junit.converter.plugin.ConvertAction" id="ConvertToJUnit5"
       text="Convert to JUnit 5">
