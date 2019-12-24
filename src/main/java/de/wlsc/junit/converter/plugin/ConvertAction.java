@@ -128,7 +128,8 @@ public class ConvertAction extends AnAction {
       annotationExpr.replace(new MarkerAnnotationExpr(new Name("Disabled")));
     }
     if (annotationExpr instanceof SingleMemberAnnotationExpr) {
-      StringLiteralExpr newValue = new StringLiteralExpr(((SingleMemberAnnotationExpr) annotationExpr).getMemberValue().asStringLiteralExpr().getValue());
+      StringLiteralExpr newValue = new StringLiteralExpr(
+          ((SingleMemberAnnotationExpr) annotationExpr).getMemberValue().asStringLiteralExpr().getValue());
       annotationExpr.replace(new SingleMemberAnnotationExpr(new Name("Disabled"), newValue));
     }
   }
@@ -156,7 +157,8 @@ public class ConvertAction extends AnAction {
     }
   }
 
-  private void wrapWithAssertTimeout(final CompilationUnit compilationUnit, final BlockStmt oldBlockStmt, final Expression annotationValue) {
+  private void wrapWithAssertTimeout(final CompilationUnit compilationUnit, final BlockStmt oldBlockStmt,
+      final Expression annotationValue) {
 
     BlockStmt previousBlockStmt = new BlockStmt(oldBlockStmt.getStatements());
     MethodCallExpr assertTimeout = new MethodCallExpr("assertTimeout",
@@ -169,7 +171,8 @@ public class ConvertAction extends AnAction {
     compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertTimeout", true, false);
   }
 
-  private void wrapWithExpected(final CompilationUnit compilationUnit, final BlockStmt oldBlockStmt, final Expression annotationValue) {
+  private void wrapWithExpected(final CompilationUnit compilationUnit, final BlockStmt oldBlockStmt,
+      final Expression annotationValue) {
 
     BlockStmt previousBlockStmt = new BlockStmt(oldBlockStmt.getStatements());
     MethodCallExpr assertTimeout = new MethodCallExpr("assertThrows",

@@ -22,7 +22,7 @@ public class TestBed {
     name21();
   }
 
-  @Test(expected = NullPointerException.class,timeout = 20L)
+  @Test(expected = NullPointerException.class, timeout = 20L)
   public void name21() {
     name2();
   }
