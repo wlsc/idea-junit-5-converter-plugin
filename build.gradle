@@ -14,14 +14,13 @@ repositories {
 
 dependencies {
     implementation 'com.github.javaparser:javaparser-core:3.15.5'
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'junit:junit:4.12'
     testImplementation "org.junit.jupiter:junit-jupiter:5.5.2"
     testRuntime "org.junit.vintage:junit-vintage-engine:5.5.2"
 }
 
 test {
-    useJUnitPlatform {
-    }
+    useJUnitPlatform()
 }
 
 wrapper {
@@ -31,6 +30,12 @@ wrapper {
 
 patchPluginXml {
     changeNotes """
-      Initial release
+      First version in which a convection between these annotations is possible:
+        * @Test with parameters => your code will be wrapped  with analogues functions in JUnit 5
+        * @BeforeClass / @AfterClass => @BeforeAll / @AfterAll
+        * @Before / @After => @BeforeEach / @AfterEach
+        * @Ignore with a comment => @Disabled with the same comment
+    
+        ... under construction. More features to come!
       """
 }
