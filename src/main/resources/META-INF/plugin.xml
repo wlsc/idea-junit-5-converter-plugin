@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>de.wlsc.junit.converter.plugin</id>
   <name>JUnit 4 to 5 converter</name>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <vendor url="https://github.com/wlsc/idea-junit-5-converter-plugin">
     idea-junit-5-converter-plugin
   </vendor>
@@ -23,4 +23,5 @@
       <add-to-group group-id="ToolsMenu"/>
     </action>
   </actions>
+  <depends>com.intellij.modules.platform</depends>
 </idea-plugin>
