@@ -33,7 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class JUnit5Converter {
+public enum JUnit5Converter {
+  INSTANCE;
 
   private static final ImmutableMap<String, String> JUST_REPLACERS = ImmutableMap.<String, String>builder()
       // imports
