@@ -36,7 +36,7 @@ import java.util.Optional;
 public enum JUnit5Converter {
   INSTANCE;
 
-  private static final ImmutableMap<String, String> JUST_REPLACERS = ImmutableMap.<String, String>builder()
+  private static final ImmutableMap<String, String> NON_STATIC_REPLACERS = ImmutableMap.<String, String>builder()
       // imports
       .put("org.junit.Test", "org.junit.jupiter.api.Test")
       .put("org.junit.Before", "org.junit.jupiter.api.BeforeEach")
@@ -49,6 +49,11 @@ public enum JUnit5Converter {
       .put("BeforeClass", "BeforeAll")
       .put("After", "AfterEach")
       .put("AfterClass", "AfterAll")
+      .build();
+
+  private static final ImmutableMap<String, String> STATIC_REPLACERS = ImmutableMap.<String, String>builder()
+      // imports
+      .put("org.junit.Assert.assertThat", "org.hamcrest.MatcherAssert.assertThat")
       .build();
 
   boolean isFileNotWritable(final VirtualFile data) {
@@ -72,10 +77,17 @@ public enum JUnit5Converter {
 
   private void replaceImports(final CompilationUnit compilationUnit) {
     for (ImportDeclaration importDeclaration : compilationUnit.findAll(ImportDeclaration.class)) {
-      Optional.ofNullable(JUST_REPLACERS.get(importDeclaration.getNameAsString()))
-          .map(name -> new ImportDeclaration(name, false, false))
-          .ifPresent(importDeclaration::replace);
+      replaceIfPresent(importDeclaration, NON_STATIC_REPLACERS, false);
+      replaceIfPresent(importDeclaration, STATIC_REPLACERS, true);
     }
+  }
+
+  private void replaceIfPresent(final ImportDeclaration importDeclaration,
+      final ImmutableMap<String, String> staticReplacers,
+      final boolean isStatic) {
+    Optional.ofNullable(staticReplacers.get(importDeclaration.getNameAsString()))
+        .map(name -> new ImportDeclaration(name, isStatic, false))
+        .ifPresent(importDeclaration::replace);
   }
 
   private void replaceAnnotations(final CompilationUnit compilationUnit) {
@@ -83,7 +95,7 @@ public enum JUnit5Converter {
 
       String name = annotationExpr.getNameAsString();
 
-      Optional.ofNullable(JUST_REPLACERS.get(name))
+      Optional.ofNullable(NON_STATIC_REPLACERS.get(name))
           .map(Name::new)
           .map(MarkerAnnotationExpr::new)
           .ifPresent(annotationExpr::replace);
