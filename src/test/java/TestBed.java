@@ -1,9 +1,7 @@
 
 import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeThat;
 import static org.junit.Assume.assumeTrue;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assume;
@@ -16,9 +14,6 @@ public class TestBed {
 
   @Test
   public void name0() {
-    assumeThat("that", CoreMatchers.anything());
-    assumeThat("assume", "that", CoreMatchers.anything());
-    Assume.assumeThat("assume", "that", CoreMatchers.anything());
     assumeTrue(true);
     assumeTrue("true", true);
     Assume.assumeTrue("true", true);
