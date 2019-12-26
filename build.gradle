@@ -31,6 +31,7 @@ wrapper {
 patchPluginXml {
     pluginDescription """
         Convert your JUnit 4 tests into JUnit 5 Jupiter with the simple contextual converter
+        to help convert your tests with ease.
     """
     changeNotes """
       First version in which a convection between these annotations is possible:
@@ -38,6 +39,7 @@ patchPluginXml {
         * @BeforeClass / @AfterClass => @BeforeAll / @AfterAll
         * @Before / @After => @BeforeEach / @AfterEach
         * @Ignore with a comment => @Disabled with the same comment
+        * Exchanged Assert / Assume with Assertions / Assumptions functions
     
         ... under construction. More features to come!
       """
