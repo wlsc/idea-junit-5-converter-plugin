@@ -38,7 +38,16 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
       .put("org.junit.Assume", "org.junit.jupiter.api.Assumptions")
       .put("org.junit.Assume.assumeTrue", "org.junit.jupiter.api.Assumptions.assumeTrue")
       .put("org.junit.Assume.assumeFalse", "org.junit.jupiter.api.Assumptions.assumeFalse")
-      .put("org.junit.Assert.assertThat", "org.hamcrest.MatcherAssert.assertThat")
+      .put("org.junit.Assert", "org.junit.jupiter.api.Assertions")
+      .put("org.junit.Assert.assertTrue", "org.junit.jupiter.api.Assertions.assertTrue")
+      .put("org.junit.Assert.assertFalse", "org.junit.jupiter.api.Assertions.assertFalse")
+      .put("org.junit.Assert.assertEquals", "org.junit.jupiter.api.Assertions.assertEquals")
+      .put("org.junit.Assert.assertNotEquals", "org.junit.jupiter.api.Assertions.assertNotEquals")
+      .put("org.junit.Assert.assertArrayEquals", "org.junit.jupiter.api.Assertions.assertArrayEquals")
+      .put("org.junit.Assert.assertNotNull", "org.junit.jupiter.api.Assertions.assertNotNull")
+      .put("org.junit.Assert.assertNull", "org.junit.jupiter.api.Assertions.assertNull")
+      .put("org.junit.Assert.assertSame", "org.junit.jupiter.api.Assertions.assertSame")
+      .put("org.junit.Assert.assertNotSame", "org.junit.jupiter.api.Assertions.assertNotSame")
       // annotations
       .put("Before", "BeforeEach")
       .put("BeforeClass", "BeforeAll")
@@ -75,21 +84,30 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(final MethodCallExpr methodCallExpr, final Void arg) {
-    replaceAssumeTrueFalseIfPresent(methodCallExpr);
+    moveMessageArgumentIfPresent(methodCallExpr);
     super.visit(methodCallExpr, arg);
   }
 
-  private void replaceAssumeTrueFalseIfPresent(final MethodCallExpr methodCallExpr) {
+  private void moveMessageArgumentIfPresent(final MethodCallExpr methodCallExpr) {
     String methodName = methodCallExpr.getNameAsString();
 
     if ("assumeTrue".equals(methodName) || "assumeFalse".equals(methodName)) {
-      NodeList<Expression> arguments = methodCallExpr.getArguments();
-      if (arguments.size() == 2) {
-        methodCallExpr.setArguments(new NodeList<>(arguments.get(1), arguments.get(0)));
-      }
-      methodCallExpr.getScope()
-          .ifPresent(expression -> methodCallExpr.setScope(new NameExpr("Assumptions")));
+      pushFirstAsLastArgument(methodCallExpr, "Assumptions");
     }
+
+    if ("assertTrue".equals(methodName) || "assertFalse".equals(methodName) || "assertNotNull".equals(methodName) ||
+        "assertArrayEquals".equals(methodName) || "assertEquals".equals(methodName) ||
+        "assertNotEquals".equals(methodName)) {
+      pushFirstAsLastArgument(methodCallExpr, "Assertions");
+    }
+  }
+
+  private void pushFirstAsLastArgument(final MethodCallExpr methodCallExpr, final String newPrefixName) {
+    NodeList<Expression> arguments = methodCallExpr.getArguments();
+    arguments.add(arguments.get(0));
+    arguments.remove(0);
+    methodCallExpr.getScope()
+        .ifPresent(expression -> methodCallExpr.setScope(new NameExpr(newPrefixName)));
   }
 
   public void replaceIgnoreIfPresent(final MarkerAnnotationExpr markerAnnotationExpr) {
