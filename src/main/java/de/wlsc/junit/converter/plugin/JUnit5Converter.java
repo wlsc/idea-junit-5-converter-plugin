@@ -44,6 +44,7 @@ public enum JUnit5Converter {
       .put("org.junit.After", "org.junit.jupiter.api.AfterEach")
       .put("org.junit.AfterClass", "org.junit.jupiter.api.AfterAll")
       .put("org.junit.Ignore", "org.junit.jupiter.api.Disabled")
+      .put("org.junit.Assume", "org.junit.jupiter.api.Assumptions")
       // annotations
       .put("Before", "BeforeEach")
       .put("BeforeClass", "BeforeAll")
@@ -54,6 +55,9 @@ public enum JUnit5Converter {
   private static final ImmutableMap<String, String> STATIC_REPLACERS = ImmutableMap.<String, String>builder()
       // imports
       .put("org.junit.Assert.assertThat", "org.hamcrest.MatcherAssert.assertThat")
+      .put("org.junit.Assume.assumeTrue", "org.junit.jupiter.api.Assumptions.assumeTrue")
+      .put("org.junit.Assume.assumeFalse", "org.junit.jupiter.api.Assumptions.assumeFalse")
+      .put("org.junit.Assume.assumeThat", "org.junit.jupiter.api.Assumptions.assumingThat")
       .build();
 
   boolean isFileNotWritable(final VirtualFile data) {
