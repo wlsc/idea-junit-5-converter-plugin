@@ -1,9 +1,19 @@
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -11,6 +21,27 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestBed {
+
+  @Test
+  public void name0a() {
+    assertTrue(true);
+    assertTrue("true", true);
+    Assert.assertTrue("true", true);
+    assertFalse(false);
+    assertFalse("false", false);
+    Assert.assertFalse("false", false);
+    assertArrayEquals(new Object[][]{}, new Object[][]{});
+    assertArrayEquals("text", new Object[]{}, new Object[]{});
+    assertEquals(25, 28);
+    assertEquals("text", 25, 28);
+    assertNotEquals(25, 28);
+    assertNotEquals("text", 25, 28);
+    assertSame("text", 25);
+    assertNotSame("text", 25);
+    assertNull(this);
+    assertNotNull(this);
+    assertNotNull("text", this);
+  }
 
   @Test
   public void name0() {
