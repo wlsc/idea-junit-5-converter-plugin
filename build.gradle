@@ -40,6 +40,10 @@ asciidoctor {
     }
 }
 
+intellij {
+    plugins = ['java']
+}
+
 patchPluginXml {
     dependsOn asciidoctor
     sinceBuild '181'
