@@ -1,0 +1,26 @@
+= JUnit 4 to Junit 5 Converter Plugin
+
+== About
+
+Convert your JUnit 4 tests into JUnit 5 Jupiter with the simple contextual converter to help convert your tests with ease.
+
+In development.
+More features to come.
+
+== Release Notes
+
+=== 1.0.0
+
+- @Test with parameters => your code will be wrapped with analogues functions in JUnit 5
+- @BeforeClass / @AfterClass => @BeforeAll / @AfterAll
+- @Before / @After => @BeforeEach / @AfterEach
+- @Ignore with a comment => @Disabled with the same comment
+- Exchanges Assert / Assume with Assertions / Assumptions functions
+
+== Developers
+
+- Wladimir Schmidt
+
+== License
+
+Please see link:LICENSE[LICENSE] file.

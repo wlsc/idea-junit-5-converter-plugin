@@ -2,13 +2,13 @@
   <id>de.wlsc.junit.converter.plugin</id>
   <name>JUnit 4 to 5 converter</name>
   <vendor url="https://github.com/wlsc/idea-junit-5-converter-plugin">
-    idea-junit-5-converter-plugin
+    JUnit 4 to Junit 5 converter plugin
   </vendor>
+  <depends>com.intellij.modules.platform</depends>
   <actions>
     <action class="de.wlsc.junit.converter.plugin.ConvertAction" id="ConvertToJUnit5"
       text="Convert to JUnit 5">
       <add-to-group group-id="ToolsMenu"/>
     </action>
   </actions>
-  <depends>com.intellij.modules.platform</depends>
 </idea-plugin>
