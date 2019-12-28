@@ -4,7 +4,7 @@
   <vendor url="https://github.com/wlsc/idea-junit-5-converter-plugin">
     JUnit 4 to Junit 5 converter plugin
   </vendor>
-  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
   <actions>
     <action class="de.wlsc.junit.converter.plugin.ConvertAction" id="ConvertToJUnit5"
       text="Convert to JUnit 5">
