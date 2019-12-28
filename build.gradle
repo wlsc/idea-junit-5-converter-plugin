@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.14'
+    id 'org.jetbrains.intellij' version '0.4.15'
 }
 
 group 'de.wlsc'
@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.javaparser:javaparser-core:3.15.5'
+    implementation 'com.github.javaparser:javaparser-core:3.15.7'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntime 'org.junit.vintage:junit-vintage-engine:5.5.2'
@@ -33,14 +33,16 @@ patchPluginXml {
         Convert your JUnit 4 tests into JUnit 5 Jupiter with the simple contextual converter
         to help convert your tests with ease.
     """
-    changeNotes """
-      First version in which a convection between these annotations is possible:
-        * @Test with parameters => your code will be wrapped  with analogues functions in JUnit 5
-        * @BeforeClass / @AfterClass => @BeforeAll / @AfterAll
-        * @Before / @After => @BeforeEach / @AfterEach
-        * @Ignore with a comment => @Disabled with the same comment
-        * Exchanged Assert / Assume with Assertions / Assumptions functions
+    changeNotes """<![CDATA[
+      <h3>First version in which a convection between these annotations is possible:</h3>
+      <ul>
+        <li>@Test with parameters => your code will be wrapped  with analogues functions in JUnit 5</li>
+        <li>@BeforeClass / @AfterClass => @BeforeAll / @AfterAll</li>
+        <li>@Before / @After => @BeforeEach / @AfterEach</li>
+        <li>@Ignore with a comment => @Disabled with the same comment</li>
+        <li>Exchanging Assert / Assume with Assertions / Assumptions functions</li>
+      </ul>
     
         ... under construction. More features to come!
-      """
+      ]]>"""
 }
