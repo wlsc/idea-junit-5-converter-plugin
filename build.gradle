@@ -1,11 +1,11 @@
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.4.15'
     id "org.asciidoctor.jvm.convert" version "3.0.0-alpha.4"
 }
-
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 
 group 'de.wlsc'
 version '1.0.0'
