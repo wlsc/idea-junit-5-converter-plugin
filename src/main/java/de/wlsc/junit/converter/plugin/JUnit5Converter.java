@@ -17,9 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum JUnit5Converter {
-  INSTANCE;
+  INSTANCE(new JUnit4Visitor());
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JUnit5Converter.class);
+  private final JUnit4Visitor jUnit4Visitor;
+
+  JUnit5Converter(final JUnit4Visitor jUnit4Visitor) {
+    this.jUnit4Visitor = jUnit4Visitor;
+  }
 
   boolean isFileNotWritable(final VirtualFile data) {
     return data == null || !data.exists() || !data.isWritable();
@@ -28,7 +33,7 @@ public enum JUnit5Converter {
   void convertToJunit5(final Path path) {
     try {
       CompilationUnit unit = StaticJavaParser.parse(path);
-      unit.accept(new JUnit4Visitor(), null);
+      unit.accept(jUnit4Visitor, null);
 
       Files.write(path, unit.toString().getBytes(UTF_8));
 
