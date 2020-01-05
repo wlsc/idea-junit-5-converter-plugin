@@ -9,6 +9,10 @@ More features to come.
 
 == Release Notes
 
+=== 1.1.0
+
+- Generates @DisplayName from method's name
+
 === 1.0.0
 
 - @Test with parameters => your code will be wrapped with analogues functions in JUnit 5

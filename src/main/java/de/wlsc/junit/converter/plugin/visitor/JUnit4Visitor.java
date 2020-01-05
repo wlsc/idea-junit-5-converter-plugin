@@ -1,8 +1,12 @@
 package de.wlsc.junit.converter.plugin.visitor;
 
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
+
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -86,6 +90,28 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final MethodCallExpr methodCallExpr, final Void arg) {
     moveMessageArgumentIfPresent(methodCallExpr);
     super.visit(methodCallExpr, arg);
+  }
+
+  @Override
+  public void visit(final MethodDeclaration methodDeclaration, final Void arg) {
+    generateDisplayNameIfTestMethod(methodDeclaration);
+    super.visit(methodDeclaration, arg);
+  }
+
+  private void generateDisplayNameIfTestMethod(final MethodDeclaration methodDeclaration) {
+    if (methodDeclaration.getAnnotationByName("DisplayName").isPresent() ||
+        (methodDeclaration.getAnnotationByName("Test").isEmpty() &&
+            methodDeclaration.getAnnotationByName("ParameterizedTest").isEmpty())) {
+      return;
+    }
+
+    String methodName = methodDeclaration.getName().asString();
+    String displayNameText = join(splitByCharacterTypeCamelCase(methodName), ' ');
+    SingleMemberAnnotationExpr displayName = new SingleMemberAnnotationExpr(new Name("DisplayName"),
+        new StringLiteralExpr(displayNameText));
+    methodDeclaration.addAnnotation(displayName);
+    methodDeclaration.findCompilationUnit()
+        .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.DisplayName"));
   }
 
   private void moveMessageArgumentIfPresent(final MethodCallExpr methodCallExpr) {
