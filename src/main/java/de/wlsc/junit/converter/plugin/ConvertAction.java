@@ -8,8 +8,12 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConvertAction extends AnAction {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ConvertAction.class);
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
@@ -25,7 +29,7 @@ public class ConvertAction extends AnAction {
           .filter(Files::isRegularFile)
           .forEach(JUnit5Converter.INSTANCE::convertToJunit5);
     } catch (Exception ex) {
-      ex.printStackTrace();
+      LOGGER.error("Cannot apply JUnit 5 conversion");
     }
 
     Messages.showInfoMessage("Selected folder was converted!", "Conversion Successful");
