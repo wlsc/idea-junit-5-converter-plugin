@@ -100,8 +100,8 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   private void generateDisplayNameIfTestMethod(final MethodDeclaration methodDeclaration) {
     if (methodDeclaration.getAnnotationByName("DisplayName").isPresent() ||
-        (methodDeclaration.getAnnotationByName("Test").isEmpty() &&
-            methodDeclaration.getAnnotationByName("ParameterizedTest").isEmpty())) {
+        (!methodDeclaration.getAnnotationByName("Test").isPresent() &&
+            !methodDeclaration.getAnnotationByName("ParameterizedTest").isPresent())) {
       return;
     }
 
