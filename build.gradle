@@ -4,7 +4,7 @@ import org.jsoup.nodes.Document
 plugins {
     id 'java'
     id 'org.jetbrains.intellij' version '0.4.15'
-    id "org.asciidoctor.jvm.convert" version "3.0.0-alpha.4"
+    id "org.asciidoctor.jvm.convert" version "3.0.0"
 }
 
 group 'de.wlsc'
@@ -17,11 +17,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.javaparser:javaparser-core:3.15.7'
+    implementation 'com.github.javaparser:javaparser-core:3.15.9'
     implementation 'org.apache.commons:commons-lang3:3.9'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.5.2'
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+    testRuntime 'org.junit.vintage:junit-vintage-engine:5.6.0'
 }
 
 test {
@@ -29,7 +29,7 @@ test {
 }
 
 wrapper {
-    gradleVersion = "6.0.1"
+    gradleVersion = "6.1.1"
     distributionType = Wrapper.DistributionType.ALL
 }
 
