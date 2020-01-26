@@ -115,6 +115,11 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   }
 
   private void moveMessageArgumentIfPresent(final MethodCallExpr methodCallExpr) {
+
+    if (methodCallExpr.getArguments().size() <= 1) {
+      return;
+    }
+
     String methodName = methodCallExpr.getNameAsString();
 
     if ("assumeTrue".equals(methodName) || "assumeFalse".equals(methodName)) {
@@ -130,8 +135,12 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   private void pushFirstAsLastArgument(final MethodCallExpr methodCallExpr, final String newPrefixName) {
     NodeList<Expression> arguments = methodCallExpr.getArguments();
-    arguments.add(arguments.get(0));
-    arguments.remove(0);
+
+    if (arguments.get(0).isStringLiteralExpr()) {
+      arguments.add(arguments.get(0));
+      arguments.remove(0);
+    }
+
     methodCallExpr.getScope()
         .ifPresent(expression -> methodCallExpr.setScope(new NameExpr(newPrefixName)));
   }
