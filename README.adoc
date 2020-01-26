@@ -9,6 +9,11 @@ More features to come.
 
 == Release Notes
 
+=== 1.1.1
+
+- Fixed bug with first argument should be a String in order to be placed last in function parameters
+- Updated library dependencies
+
 === 1.1.0
 
 - Generates @DisplayName from method's name
@@ -24,6 +29,10 @@ More features to come.
 == Developers
 
 - Wladimir Schmidt
+
+== Known issues
+
+- Message argument parameter (for example, for "assertFalse") when it is not a String, it won't be pushed last.
 
 == License
 
