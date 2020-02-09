@@ -9,6 +9,10 @@ More features to come.
 
 == Release Notes
 
+=== 1.1.3
+
+- Bugfix: the first character in generated @DisplayName annotation is now capitalized
+
 === 1.1.2
 
 - Opinionated change: applying converter only to tests ending with *Test.java
