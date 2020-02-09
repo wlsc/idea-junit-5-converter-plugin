@@ -3,8 +3,8 @@ import org.jsoup.nodes.Document
 
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.15'
-    id "org.asciidoctor.jvm.convert" version "3.0.0"
+    id 'org.jetbrains.intellij' version '0.4.16'
+    id "org.asciidoctor.jvm.convert" version "3.1.0"
 }
 
 group 'de.wlsc'
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.javaparser:javaparser-core:3.15.9'
+    implementation 'com.github.javaparser:javaparser-core:3.15.11'
     implementation 'org.apache.commons:commons-lang3:3.9'
     testImplementation 'junit:junit:4.13'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
