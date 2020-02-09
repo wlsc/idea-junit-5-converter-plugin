@@ -106,12 +106,20 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
     }
 
     String methodName = methodDeclaration.getName().asString();
-    String displayNameText = join(splitByCharacterTypeCamelCase(methodName), ' ');
+    String[] words = splitByCharacterTypeCamelCase(methodName);
+
+    words[0] = capitalizeFirstCharNormalizeOthers(words[0]);
+
+    String displayNameText = join(words, ' ');
     SingleMemberAnnotationExpr displayName = new SingleMemberAnnotationExpr(new Name("DisplayName"),
         new StringLiteralExpr(displayNameText));
     methodDeclaration.addAnnotation(displayName);
     methodDeclaration.findCompilationUnit()
         .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.DisplayName"));
+  }
+
+  private String capitalizeFirstCharNormalizeOthers(final String word) {
+    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
   }
 
   private void moveMessageArgumentIfPresent(final MethodCallExpr methodCallExpr) {
