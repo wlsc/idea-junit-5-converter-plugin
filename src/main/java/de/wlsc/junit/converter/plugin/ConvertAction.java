@@ -27,6 +27,7 @@ public class ConvertAction extends AnAction {
     try {
       Files.walk(Paths.get(data.getPath()))
           .filter(Files::isRegularFile)
+          .filter(path -> path.toString().toLowerCase().endsWith("test.java"))
           .forEach(JUnit5Converter.INSTANCE::convertToJunit5);
     } catch (Exception ex) {
       LOGGER.error("Cannot apply JUnit 5 conversion");

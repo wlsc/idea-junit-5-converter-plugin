@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class TestBed {
+public class JUnit4Test {
 
   @Test
   public void name0a() {
