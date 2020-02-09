@@ -48,6 +48,7 @@ intellij {
 patchPluginXml {
     dependsOn asciidoctor
     sinceBuild '181'
+    untilBuild = ''
     changeNotes = {
         getReadme().select(".sect2").html()
     }
