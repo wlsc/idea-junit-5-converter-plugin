@@ -124,7 +124,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   private void moveMessageArgumentIfPresent(final MethodCallExpr methodCallExpr) {
 
-    if (methodCallExpr.getArguments().size() <= 1) {
+    if (methodCallExpr.getArguments().size() < 1) {
       return;
     }
 

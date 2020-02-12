@@ -40,6 +40,7 @@ public class JUnit4Test {
     assertNotSame("text", 25);
     assertNull(this);
     assertNotNull(this);
+    Assert.assertNotNull(this);
     assertNotNull("text", this);
   }
 
