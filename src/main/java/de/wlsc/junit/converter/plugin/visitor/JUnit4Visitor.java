@@ -52,6 +52,12 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
       .put("org.junit.Assert.assertNull", "org.junit.jupiter.api.Assertions.assertNull")
       .put("org.junit.Assert.assertSame", "org.junit.jupiter.api.Assertions.assertSame")
       .put("org.junit.Assert.assertNotSame", "org.junit.jupiter.api.Assertions.assertNotSame")
+      // spring specific
+      .put("org.junit.runner.RunWith", "org.junit.jupiter.api.extension.ExtendWith")
+      .put("org.springframework.test.context.junit4.SpringRunner",
+          "org.springframework.test.context.junit.jupiter.SpringExtension")
+      .put("org.springframework.test.context.junit4.SpringJUnit4ClassRunner",
+          "org.springframework.test.context.junit.jupiter.SpringExtension")
       // annotations
       .put("Before", "BeforeEach")
       .put("BeforeClass", "BeforeAll")
@@ -74,6 +80,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(final SingleMemberAnnotationExpr singleMemberAnnotationExpr, final Void arg) {
+    replaceSpringRunners(singleMemberAnnotationExpr);
     replaceAnnotationNameIfPresent(singleMemberAnnotationExpr);
     replaceIgnoreWithParameterIfPresent(singleMemberAnnotationExpr);
     super.visit(singleMemberAnnotationExpr, arg);
@@ -96,6 +103,17 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final MethodDeclaration methodDeclaration, final Void arg) {
     generateDisplayNameIfTestMethod(methodDeclaration);
     super.visit(methodDeclaration, arg);
+  }
+
+  private void replaceSpringRunners(final SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
+    Stream.of(singleMemberAnnotationExpr)
+        .filter(expr -> "RunWith".equals(expr.getNameAsString()))
+        .filter(expr -> "SpringRunner".equals(expr.getMemberValue().asClassExpr().getType().asString()) ||
+            "SpringJUnit4ClassRunner".equals(expr.getMemberValue().asClassExpr().getType().asString()))
+        .map(expr -> "SpringExtension.class")
+        .map(NameExpr::new)
+        .map(clazzName -> new SingleMemberAnnotationExpr(new Name("ExtendWith"), clazzName))
+        .forEach(singleMemberAnnotationExpr::replace);
   }
 
   private void generateDisplayNameIfTestMethod(final MethodDeclaration methodDeclaration) {
