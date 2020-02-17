@@ -27,6 +27,7 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
@@ -53,11 +54,12 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
       .put("org.junit.Assert.assertSame", "org.junit.jupiter.api.Assertions.assertSame")
       .put("org.junit.Assert.assertNotSame", "org.junit.jupiter.api.Assertions.assertNotSame")
       // spring specific
-      .put("org.junit.runner.RunWith", "org.junit.jupiter.api.extension.ExtendWith")
       .put("org.springframework.test.context.junit4.SpringRunner",
           "org.springframework.test.context.junit.jupiter.SpringExtension")
       .put("org.springframework.test.context.junit4.SpringJUnit4ClassRunner",
           "org.springframework.test.context.junit.jupiter.SpringExtension")
+      // mockito specific
+      .put("org.mockito.junit.MockitoJUnitRunner", "org.mockito.junit.jupiter.MockitoExtension")
       // annotations
       .put("Before", "BeforeEach")
       .put("BeforeClass", "BeforeAll")
@@ -80,7 +82,8 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(final SingleMemberAnnotationExpr singleMemberAnnotationExpr, final Void arg) {
-    replaceSpringRunners(singleMemberAnnotationExpr);
+    replaceMockitoRunner(singleMemberAnnotationExpr);
+    replaceSpringRunner(singleMemberAnnotationExpr);
     replaceAnnotationNameIfPresent(singleMemberAnnotationExpr);
     replaceIgnoreWithParameterIfPresent(singleMemberAnnotationExpr);
     super.visit(singleMemberAnnotationExpr, arg);
@@ -105,15 +108,29 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
     super.visit(methodDeclaration, arg);
   }
 
-  private void replaceSpringRunners(final SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
-    Stream.of(singleMemberAnnotationExpr)
+  private void replaceMockitoRunner(final SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
+    replaceRunWithAnnotation(singleMemberAnnotationExpr, "MockitoExtension.class",
+        "MockitoJUnitRunner"::equals);
+  }
+
+  private void replaceSpringRunner(final SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
+    replaceRunWithAnnotation(singleMemberAnnotationExpr, "SpringExtension.class",
+        className -> "SpringRunner".equals(className) || "SpringJUnit4ClassRunner".equals(className));
+  }
+
+  private void replaceRunWithAnnotation(final SingleMemberAnnotationExpr annotationExpr,
+      final String newClassValue, final Predicate<String> predicate) {
+
+    Stream.of(annotationExpr)
         .filter(expr -> "RunWith".equals(expr.getNameAsString()))
-        .filter(expr -> "SpringRunner".equals(expr.getMemberValue().asClassExpr().getType().asString()) ||
-            "SpringJUnit4ClassRunner".equals(expr.getMemberValue().asClassExpr().getType().asString()))
-        .map(expr -> "SpringExtension.class")
+        .filter(expr -> predicate.test(expr.getMemberValue().asClassExpr().getType().asString()))
+        .map(expr -> newClassValue)
         .map(NameExpr::new)
         .map(clazzName -> new SingleMemberAnnotationExpr(new Name("ExtendWith"), clazzName))
-        .forEach(singleMemberAnnotationExpr::replace);
+        .forEach(annotationExpr::replace);
+
+    annotationExpr.findCompilationUnit()
+        .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.extension.ExtendWith"));
   }
 
   private void generateDisplayNameIfTestMethod(final MethodDeclaration methodDeclaration) {
@@ -250,7 +267,6 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
     oldBlockStmt.setStatements(new NodeList<>(timeoutStatement));
 
     oldBlockStmt.findCompilationUnit()
-        .ifPresent(compilationUnit ->
-            compilationUnit.addImport("org.junit.jupiter.api.Assertions.assertThrows", true, false));
+        .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.Assertions.assertThrows", true, false));
   }
 }
