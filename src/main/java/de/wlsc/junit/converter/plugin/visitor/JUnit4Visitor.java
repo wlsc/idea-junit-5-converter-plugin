@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
@@ -74,6 +75,12 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   }
 
   @Override
+  public void visit(final ClassOrInterfaceDeclaration classOrInterfaceDeclaration, final Void arg) {
+    generateDisplayNameAnnotationIfNotExist(classOrInterfaceDeclaration);
+    super.visit(classOrInterfaceDeclaration, arg);
+  }
+
+  @Override
   public void visit(final MarkerAnnotationExpr markerAnnotationExpr, final Void arg) {
     replaceAnnotationNameIfPresent(markerAnnotationExpr);
     replaceIgnoreIfPresent(markerAnnotationExpr);
@@ -106,6 +113,18 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final MethodDeclaration methodDeclaration, final Void arg) {
     generateDisplayNameIfTestMethod(methodDeclaration);
     super.visit(methodDeclaration, arg);
+  }
+
+  private void generateDisplayNameAnnotationIfNotExist(final ClassOrInterfaceDeclaration classDeclaration) {
+    if (classDeclaration.getAnnotationByName("DisplayName").isPresent()) {
+      return;
+    }
+
+    SingleMemberAnnotationExpr displayName = createCapitalizedDisplayNameBy(classDeclaration.getNameAsString());
+    classDeclaration.addAnnotation(displayName);
+
+    classDeclaration.findCompilationUnit()
+        .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.DisplayName"));
   }
 
   private void replaceMockitoRunner(final SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
@@ -141,16 +160,20 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
     }
 
     String methodName = methodDeclaration.getName().asString();
-    String[] words = splitByCharacterTypeCamelCase(methodName);
+    methodDeclaration.addAnnotation(createCapitalizedDisplayNameBy(methodName));
 
-    words[0] = capitalizeFirstCharNormalizeOthers(words[0]);
-
-    String displayNameText = join(words, ' ');
-    SingleMemberAnnotationExpr displayName = new SingleMemberAnnotationExpr(new Name("DisplayName"),
-        new StringLiteralExpr(displayNameText));
-    methodDeclaration.addAnnotation(displayName);
     methodDeclaration.findCompilationUnit()
         .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.DisplayName"));
+  }
+
+  private SingleMemberAnnotationExpr createCapitalizedDisplayNameBy(final String methodName) {
+
+    String[] words = splitByCharacterTypeCamelCase(methodName);
+    words[0] = capitalizeFirstCharNormalizeOthers(words[0]);
+    String displayNameText = join(words, ' ');
+
+    return new SingleMemberAnnotationExpr(new Name("DisplayName"),
+        new StringLiteralExpr(displayNameText));
   }
 
   private String capitalizeFirstCharNormalizeOthers(final String word) {
