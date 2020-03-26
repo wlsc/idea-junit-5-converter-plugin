@@ -9,6 +9,10 @@ More features to come.
 
 == Release Notes
 
+=== 1.3.0
+
+- Feature: support for TemporaryFolder conversion
+
 === 1.2.0
 
 - Feature: initial Mockito (MockitoExtension) support
