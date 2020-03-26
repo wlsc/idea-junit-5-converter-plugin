@@ -7,7 +7,9 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -25,6 +27,7 @@ import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.google.common.collect.ImmutableMap;
 import java.util.Optional;
@@ -54,6 +57,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
       .put("org.junit.Assert.assertNull", "org.junit.jupiter.api.Assertions.assertNull")
       .put("org.junit.Assert.assertSame", "org.junit.jupiter.api.Assertions.assertSame")
       .put("org.junit.Assert.assertNotSame", "org.junit.jupiter.api.Assertions.assertNotSame")
+      .put("org.junit.rules.TemporaryFolder", "org.junit.jupiter.api.io.TempDir")
       // spring specific
       .put("org.springframework.test.context.junit4.SpringRunner",
           "org.springframework.test.context.junit.jupiter.SpringExtension")
@@ -78,6 +82,12 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final ClassOrInterfaceDeclaration classOrInterfaceDeclaration, final Void arg) {
     generateDisplayNameAnnotationIfNotExist(classOrInterfaceDeclaration);
     super.visit(classOrInterfaceDeclaration, arg);
+  }
+
+  @Override
+  public void visit(final FieldDeclaration fieldDeclaration, final Void arg) {
+    replaceTemporaryFolderFieldIfPresent(fieldDeclaration);
+    super.visit(fieldDeclaration, arg);
   }
 
   @Override
@@ -113,6 +123,57 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final MethodDeclaration methodDeclaration, final Void arg) {
     generateDisplayNameIfTestMethod(methodDeclaration);
     super.visit(methodDeclaration, arg);
+  }
+
+  @Override
+  public void visit(final VariableDeclarator variableDeclarator, final Void arg) {
+    replaceTmpFolderFileCreationIfPresent(variableDeclarator);
+    super.visit(variableDeclarator, arg);
+  }
+
+  private void replaceTmpFolderFileCreationIfPresent(final VariableDeclarator variableDeclarator) {
+    if (!variableDeclarator.getType().asString().equals("File")) {
+      return;
+    }
+    variableDeclarator.getInitializer()
+        .filter(expression -> expression instanceof MethodCallExpr)
+        .map(expression -> (MethodCallExpr) expression)
+        .filter(methodCallExpr -> methodCallExpr.getName().asString().equals("newFile"))
+        .ifPresent(this::replaceTmpFolderFileCreation);
+  }
+
+  private void replaceTmpFolderFileCreation(final MethodCallExpr methodCallExpr) {
+    MethodCallExpr resolveExpression = methodCallExpr.clone()
+        .setName("resolve");
+
+    MethodCallExpr toFileExpression = methodCallExpr.clone()
+        .setName("toFile")
+        .setArguments(new NodeList<>())
+        .setScope(resolveExpression);
+
+    methodCallExpr.replace(toFileExpression);
+  }
+
+  private void replaceTemporaryFolderFieldIfPresent(final FieldDeclaration fieldDeclaration) {
+    fieldDeclaration.getVariables()
+        .stream()
+        .map(VariableDeclarator::getType)
+        .map(Type::asString)
+        .filter("TemporaryFolder"::equals)
+        .findFirst()
+        .flatMap(s -> fieldDeclaration.getAnnotationByName("Rule"))
+        .ifPresent(annotationExpr -> replaceTemporaryFolder(fieldDeclaration, annotationExpr));
+  }
+
+  private void replaceTemporaryFolder(final FieldDeclaration fieldDeclaration, final AnnotationExpr annotationExpr) {
+    annotationExpr.replace(new MarkerAnnotationExpr("TempDir"));
+    VariableDeclarator variableDeclarator = new VariableDeclarator();
+    variableDeclarator.setType("Path");
+    variableDeclarator.setName(fieldDeclaration.getVariable(0).getName());
+    fieldDeclaration.setVariable(0, variableDeclarator);
+
+    fieldDeclaration.findCompilationUnit()
+        .ifPresent(unit -> unit.addImport("java.nio.file.Path"));
   }
 
   private void generateDisplayNameAnnotationIfNotExist(final ClassOrInterfaceDeclaration classDeclaration) {
@@ -211,7 +272,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
         .ifPresent(expression -> methodCallExpr.setScope(new NameExpr(newPrefixName)));
   }
 
-  public void replaceIgnoreIfPresent(final MarkerAnnotationExpr markerAnnotationExpr) {
+  private void replaceIgnoreIfPresent(final MarkerAnnotationExpr markerAnnotationExpr) {
     Stream.of(markerAnnotationExpr)
         .filter(expr -> "Ignore".equals(expr.getNameAsString()))
         .map(expr -> new Name("Disabled"))
