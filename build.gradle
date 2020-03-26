@@ -3,7 +3,7 @@ import org.jsoup.nodes.Document
 
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.16'
+    id 'org.jetbrains.intellij' version '0.4.17'
     id "org.asciidoctor.jvm.convert" version "3.1.0"
 }
 
