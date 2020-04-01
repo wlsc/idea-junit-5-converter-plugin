@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     implementation 'com.github.javaparser:javaparser-core:3.15.11'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:1.5.22.RELEASE'
 }
 
 wrapper {
