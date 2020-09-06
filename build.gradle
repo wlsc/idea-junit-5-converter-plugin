@@ -36,7 +36,7 @@ asciidoctor {
 
 intellij {
     plugins = ['java']
-    version = '2020.1.4'
+    version = '2020.2.1'
 }
 
 patchPluginXml {
