@@ -215,8 +215,8 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   private void generateDisplayNameIfTestMethod(final MethodDeclaration methodDeclaration) {
     if (methodDeclaration.getAnnotationByName("DisplayName").isPresent() ||
-        (!methodDeclaration.getAnnotationByName("Test").isPresent() &&
-            !methodDeclaration.getAnnotationByName("ParameterizedTest").isPresent())) {
+        (methodDeclaration.getAnnotationByName("Test").isEmpty() &&
+            methodDeclaration.getAnnotationByName("ParameterizedTest").isEmpty())) {
       return;
     }
 
@@ -330,7 +330,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
     BlockStmt previousBlockStmt = new BlockStmt(oldBlockStmt.getStatements());
     MethodCallExpr assertTimeout = new MethodCallExpr("assertTimeout",
-        new MethodCallExpr("ofMillis", new LongLiteralExpr(annotationValue.asLongLiteralExpr().asLong())),
+        new MethodCallExpr("ofMillis", new LongLiteralExpr(annotationValue.asLongLiteralExpr().asNumber().toString())),
         new LambdaExpr(new NodeList<>(), previousBlockStmt));
     Statement timeoutStatement = new ExpressionStmt(assertTimeout);
     oldBlockStmt.setStatements(new NodeList<>(timeoutStatement));
