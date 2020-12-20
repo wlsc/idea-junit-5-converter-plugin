@@ -61,7 +61,7 @@ public class ConvertAction extends AnAction {
             });
           }));
     } catch (Exception ex) {
-      LOGGER.error("Cannot apply JUnit 5 conversion");
+      LOGGER.error("Cannot apply JUnit 5 conversion", ex);
     }
 
     Messages.showInfoMessage("Selected folder/file was converted!", "Conversion Successful");
