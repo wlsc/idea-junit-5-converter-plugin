@@ -3,8 +3,8 @@ import org.jsoup.nodes.Document
 
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.22'
-    id 'org.asciidoctor.jvm.convert' version '3.2.0'
+    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.asciidoctor.jvm.convert' version '3.3.0'
 }
 
 group 'de.wlsc'
@@ -17,12 +17,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.javaparser:javaparser-core:3.16.1'
+    implementation 'com.github.javaparser:javaparser-core:3.18.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:1.5.22.RELEASE'
 }
 
 wrapper {
-    gradleVersion = '6.6.1'
+    gradleVersion = '6.7.1'
     distributionType = Wrapper.DistributionType.ALL
 }
 
@@ -36,7 +36,7 @@ asciidoctor {
 
 intellij {
     plugins = ['java']
-    version = '2020.2.1'
+    version = '2020.3'
 }
 
 patchPluginXml {
