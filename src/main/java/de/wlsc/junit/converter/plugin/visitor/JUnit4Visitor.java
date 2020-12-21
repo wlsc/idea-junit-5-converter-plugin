@@ -1,9 +1,12 @@
 package de.wlsc.junit.converter.plugin.visitor;
 
+import static com.github.javaparser.ast.Modifier.Keyword.PUBLIC;
+import static java.util.stream.Collectors.toCollection;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -80,6 +83,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(final ClassOrInterfaceDeclaration classOrInterfaceDeclaration, final Void arg) {
+    setClassPackagePrivate(classOrInterfaceDeclaration);
     generateDisplayNameAnnotationIfNotExist(classOrInterfaceDeclaration);
     super.visit(classOrInterfaceDeclaration, arg);
   }
@@ -121,6 +125,7 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(final MethodDeclaration methodDeclaration, final Void arg) {
+    setMethodPackagePrivate(methodDeclaration);
     generateDisplayNameIfTestMethod(methodDeclaration);
     super.visit(methodDeclaration, arg);
   }
@@ -129,6 +134,34 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
   public void visit(final VariableDeclarator variableDeclarator, final Void arg) {
     replaceTmpFolderFileCreationIfPresent(variableDeclarator);
     super.visit(variableDeclarator, arg);
+  }
+
+  private void setClassPackagePrivate(final ClassOrInterfaceDeclaration classOrInterfaceDeclaration) {
+    NodeList<Modifier> newModifiers = classOrInterfaceDeclaration.getModifiers()
+        .stream()
+        .filter(modifier -> modifier.getKeyword() != PUBLIC)
+        .collect(toCollection(NodeList::new));
+    classOrInterfaceDeclaration.setModifiers(newModifiers);
+  }
+
+  private void setMethodPackagePrivate(final MethodDeclaration method) {
+    if (!method.isAnnotationPresent("Test") &&
+        !method.isAnnotationPresent("Before") &&
+        !method.isAnnotationPresent("BeforeEach") &&
+        !method.isAnnotationPresent("BeforeClass") &&
+        !method.isAnnotationPresent("BeforeAll") &&
+        !method.isAnnotationPresent("After") &&
+        !method.isAnnotationPresent("AfterEach") &&
+        !method.isAnnotationPresent("AfterClass") &&
+        !method.isAnnotationPresent("AfterAll")) {
+      return;
+    }
+
+    NodeList<Modifier> newModifiers = method.getModifiers()
+        .stream()
+        .filter(modifier -> modifier.getKeyword() != PUBLIC)
+        .collect(toCollection(NodeList::new));
+    method.setModifiers(newModifiers);
   }
 
   private void replaceTmpFolderFileCreationIfPresent(final VariableDeclarator variableDeclarator) {
