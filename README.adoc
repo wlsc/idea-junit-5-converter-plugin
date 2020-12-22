@@ -9,13 +9,18 @@ More features to come.
 
 == Release Notes
 
+=== 1.4.1
+
+- Bugfix: Honoring comments in functions body, also removed throws exception from method declaration
+for assertThrows conversions
+
 === 1.4.0
 
 - Feature: Reduced scope of test methods and class to package private
 
 === 1.3.2
 
-- Fixed bug with Code Formatter
+- Bugfix: Fixed bug with Code Formatter
 - Updated internal library dependencies
 
 === 1.3.1
