@@ -335,9 +335,17 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
             String identifier = pair.getName().asString();
             if ("timeout".equals(identifier)) {
               wrapWithAssertTimeout((BlockStmt) childNode, pair.getValue());
+              normalAnnotationExpr.findCompilationUnit().ifPresent(unit -> {
+                unit.addImport("java.time.Duration.ofMillis", true, false);
+                unit.addImport("org.junit.jupiter.api.Assertions.assertTimeout", true, false);
+              });
+              return;
             }
             if ("expected".equals(identifier)) {
               wrapWithExpected((BlockStmt) childNode, pair.getValue());
+              normalAnnotationExpr.findCompilationUnit()
+                  .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.Assertions.assertThrows", true, false));
+              return;
             }
           }
         }
@@ -361,29 +369,30 @@ public class JUnit4Visitor extends VoidVisitorAdapter<Void> {
 
   private void wrapWithAssertTimeout(final BlockStmt oldBlockStmt, final Expression annotationValue) {
 
-    BlockStmt previousBlockStmt = new BlockStmt(oldBlockStmt.getStatements());
-    MethodCallExpr assertTimeout = new MethodCallExpr("assertTimeout",
-        new MethodCallExpr("ofMillis", new LongLiteralExpr(annotationValue.asLongLiteralExpr().asNumber().toString())),
-        new LambdaExpr(new NodeList<>(), previousBlockStmt));
-    Statement timeoutStatement = new ExpressionStmt(assertTimeout);
-    oldBlockStmt.setStatements(new NodeList<>(timeoutStatement));
-
-    oldBlockStmt.findCompilationUnit().ifPresent(unit -> {
-      unit.addImport("java.time.Duration.ofMillis", true, false);
-      unit.addImport("org.junit.jupiter.api.Assertions.assertTimeout", true, false);
-    });
+    Number annotationNumber = annotationValue.asLongLiteralExpr().asNumber();
+    MethodCallExpr ofMillis = new MethodCallExpr("ofMillis", new LongLiteralExpr(annotationNumber.toString()));
+    exchangeOldBodyWithNewBodyStatement(oldBlockStmt, ofMillis, "assertTimeout");
   }
 
   private void wrapWithExpected(final BlockStmt oldBlockStmt, final Expression annotationValue) {
+    ClassExpr classExpr = new ClassExpr(annotationValue.asClassExpr().getType());
+    exchangeOldBodyWithNewBodyStatement(oldBlockStmt, classExpr, "assertThrows");
+  }
 
-    BlockStmt previousBlockStmt = new BlockStmt(oldBlockStmt.getStatements());
-    MethodCallExpr assertTimeout = new MethodCallExpr("assertThrows",
-        new ClassExpr(annotationValue.asClassExpr().getType()),
-        new LambdaExpr(new NodeList<>(), previousBlockStmt));
-    Statement timeoutStatement = new ExpressionStmt(assertTimeout);
-    oldBlockStmt.setStatements(new NodeList<>(timeoutStatement));
+  private void exchangeOldBodyWithNewBodyStatement(final BlockStmt oldBlockStmt, Expression expression,
+      String methodName) {
 
-    oldBlockStmt.findCompilationUnit()
-        .ifPresent(unit -> unit.addImport("org.junit.jupiter.api.Assertions.assertThrows", true, false));
+    MethodCallExpr methodCallExpression = new MethodCallExpr(methodName, expression,
+        new LambdaExpr(new NodeList<>(), oldBlockStmt.clone()));
+    Statement statement = new ExpressionStmt(methodCallExpression);
+    BlockStmt newBlockStmt = new BlockStmt();
+    newBlockStmt.setStatements(new NodeList<>(statement));
+
+    oldBlockStmt.getParentNode()
+        .map(MethodDeclaration.class::cast)
+        .ifPresent(methodDeclaration -> {
+          methodDeclaration.setThrownExceptions(new NodeList<>());
+          methodDeclaration.setBody(newBlockStmt);
+        });
   }
 }

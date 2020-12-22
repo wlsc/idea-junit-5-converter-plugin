@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.IOException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -102,5 +103,19 @@ public class JUnit4Test {
   @AfterClass
   public static void after1() {
 
+  }
+
+  @Test(expected = IOException.class)
+  public void test() throws IOException {
+    // SETUP
+    String s = "test";
+    // ... Some more setup here ...
+
+    // TEST
+    testMethod(s);
+  }
+
+  public String testMethod(String s) throws IOException {
+    throw new IOException();
   }
 }
